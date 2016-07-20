@@ -14,11 +14,11 @@ var fs = require('fs'),
  *
  *  
  * @param  {Path[String]} projectDir [Path to anywhere within the PhoneGap project being modified]
- * @param  {EventEmitter|False} phonegap   [Used for events emitting. If undefined, 'log' and 'warn' will log to console. If false, will silence logging] (optional) 
+ * @param  {EventEmitter|False} extEvents   [Used for events emitting. If undefined, 'log' and 'warn' will log to console. If false, will silence logging] (optional) 
  * @return {Promise|Error}            [Returns the project root path or a cordova error.]
  */
-module.exports.exec = function (projectDir, phonegap) {
-	phonegap = phonegap ? phonegap : ConsoleEmitter(phonegap);
+module.exports.exec = function (projectDir, extEvents) {
+	extEvents = extEvents ? extEvents : ConsoleEmitter(extEvents);
 	var PROJECTROOT;
 	return Q()
 	.then(function(){
@@ -35,7 +35,7 @@ module.exports.exec = function (projectDir, phonegap) {
 			pkgJsonPath = path.resolve(projectRoot, 'package.json');
 
 		if (!fs.existsSync(pkgJsonPath)) {
-			phonegap.emit('warn', 'No package.json was found for your project. Creating one from config.xml');		
+			extEvents.emit('warn', 'No package.json was found for your project. Creating one from config.xml');		
 			config = new ConfigParser(path.resolve(projectRoot, 'config.xml'));
 			pkgJson = {};
             pkgJson.name = (config.name() || path.basename(projectRoot)).toLowerCase().replace(' ',''); 
@@ -57,7 +57,7 @@ module.exports.exec = function (projectDir, phonegap) {
 
 		    // Find the latest version of Cordova published and install it
 	        var cordovaCommand= 'npm install cordova --save';
-	        phonegap.emit('log', 'Adding Cordova dependency with: "' +  cordovaCommand +'"');
+	        extEvents.emit('log', 'Adding Cordova dependency with: "' +  cordovaCommand +'"');
 	        /* OR Find the system version of Cordova installed //To/Do: handle dev version case
 	        *  var cordovaVersionCommand = 'cordova -v'
 	        *  var cordovaVersion = ... use shell.exec
@@ -68,12 +68,12 @@ module.exports.exec = function (projectDir, phonegap) {
 	                e = new Error('Installing cordova as project dependency: '+ stdout.replace('\n',''));
 	                deferred.reject(e);
 	            } else {
-	                phonegap.emit('verbose', 'Project is using Cordova '+ stdout.replace('\n',''))
+	                extEvents.emit('verbose', 'Project is using Cordova '+ stdout.replace('\n',''))
 	                deferred.resolve(stdout.replace('\n',''));
 	            }
 	        });
 		} else {
-			phonegap.emit('verbose', 'Found Cordova dependency in package.json');
+			extEvents.emit('verbose', 'Found Cordova dependency in package.json');
 			deferred.resolve();
 		}
 		return deferred.promise;	
