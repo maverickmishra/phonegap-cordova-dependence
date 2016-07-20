@@ -1,0 +1,27 @@
+{
+  "name": "phonegap-cordova-dependence",
+  "version": "0.0.1",
+  "description": "Checks for, adds, and installs Apache Cordova as a dependency to PhoneGap projects via npm. Parses config.xml to create package.json.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine --color spec/test.spec.js"
+  },
+  "keywords": [
+    "phonegap",
+    "cordova",
+    "package"
+  ],
+  "author": "carynbear",
+  "license": "ISC",
+  "dependencies": {
+    "cordova-common": "^1.3.0",
+    "cordova-lib": "^6.2.0",
+    "jasmine": "^2.4.1",
+    "q": "^1.4.1",
+    "shelljs": "^0.7.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5",
+    "mockery": "^1.7.0"
+  }
+}
