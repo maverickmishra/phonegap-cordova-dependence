@@ -3,7 +3,7 @@ var fs = require('fs'),
 	EventEmitter = require('events').EventEmitter,
 	Q = require('q'),
 	shell = require('shelljs'),
-	getProjectRoot = require('cordova-lib').cordova.findProjectRoot,
+	getProjectRoot = require('cordova-common').CordovaCheck.findProjectRoot,
 	ConfigParser = require('cordova-common').ConfigParser;
 /**
  * Given a PhoneGap project, pin Cordova as a dependency. Installation is not verified if dependency already exists.
