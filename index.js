@@ -24,12 +24,13 @@ module.exports.exec = function (projectDir, extEvents) {
 	.then(function(){
 		var project = getProjectRoot(projectDir);
 		if (!project) {
-			return Q.reject(new Error('"'+projectDir+'"' + 'does not point to a valid PhoneGap project'));
+			return Q.reject(new Error('"'+projectDir+'" ' + 'does not point to a valid PhoneGap project'));
 		} else {
 			PROJECTROOT = project;
 			return project;
 		}
 	}).then(function(projectRoot){
+		shell.cd(projectRoot);
 		var config,
 			pkgJson,
 			pkgJsonPath = path.resolve(projectRoot, 'package.json');
@@ -68,6 +69,7 @@ module.exports.exec = function (projectDir, extEvents) {
 	                e = new Error('Installing cordova as project dependency: '+ stdout.replace('\n',''));
 	                deferred.reject(e);
 	            } else {
+	            	//ToDo: @carynbear progress bar is needed to show npm status
 	                extEvents.emit('verbose', 'Project is using Cordova '+ stdout.replace('\n',''))
 	                deferred.resolve(stdout.replace('\n',''));
 	            }
