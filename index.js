@@ -64,15 +64,24 @@ module.exports.exec = function (projectDir, extEvents) {
 	        *  var cordovaVersion = ... use shell.exec
 	        *  var cordovaCommand = 'npm install --save cordova@'+ cordovaVersion 
 	        */
-	        shell.exec(cordovaCommand, {silent:true}, function(code, stdout, stderr) {
+	        var child = shell.exec(cordovaCommand, {silent:true}, function(code, stdout, stderr) {
 	            if (code != 0) {
-	                e = new Error('Installing cordova as project dependency: '+ stdout.replace('\n',''));
+	                e = new Error('Error from npm: '+ stdout.replace('\n',''));
+	                e.exitCode = code;
 	                deferred.reject(e);
 	            } else {
 	            	//ToDo: @carynbear progress bar is needed to show npm status
 	                extEvents.emit('verbose', 'Project is using Cordova '+ stdout.replace('\n',''))
 	                deferred.resolve(stdout.replace('\n',''));
 	            }
+	        });
+
+	        child.stdout.on('data', function(data) {
+	            extEvents.emit('raw', data.toString('utf8').replace('\n',''));
+	        });
+
+	        child.stderr.on('data', function(data) {
+				extEvents.emit('raw', data.toString('utf8').replace('\n',''));
 	        });
 		} else {
 			extEvents.emit('verbose', 'Found Cordova dependency in package.json');

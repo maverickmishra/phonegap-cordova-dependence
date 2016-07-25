@@ -4,7 +4,11 @@ var path = require('path'),
 	shell = require('shelljs'),
 	EventEmitter = require('events').EventEmitter,
 	mockery = require('mockery'),
-	fn = require('../index').exec;
+	fn = require('../index').exec,
+	processSpy = {
+        stdout: new EventEmitter(),
+        stderr: new EventEmitter()
+    };
 
 
 var tests = path.resolve(__dirname, 'testcases');
@@ -20,7 +24,7 @@ describe('phonegap cordova dependency tests', function(){
 		.then(function(){
 			expect('fail').toBe('thrown');
 		}).fail(function(err){
-			expect(err.message).toBe('"'+projectDir+'"' + 'does not point to a valid PhoneGap project');
+			expect(err.message).toBe('"'+projectDir+'"' + ' does not point to a valid PhoneGap project');
 		}).fin(done);
 	});
 
@@ -30,7 +34,7 @@ describe('phonegap cordova dependency tests', function(){
 		.then(function(){
 			expect('fail').toBe('thrown');
 		}).fail(function(err){
-			expect(err.message).toBe('"'+projectDir+'"' + 'does not point to a valid PhoneGap project');
+			expect(err.message).toBe('"'+projectDir+'"' + ' does not point to a valid PhoneGap project');
 		}).fin(done);
 	}); 
 
@@ -43,6 +47,7 @@ describe('phonegap cordova dependency tests', function(){
 			spyOn(shell, 'which').and.returnValue(true);
 			spyOn(shell, 'exec').and.callFake(function(command, options, callback){ 
 				callback(0, 'success');
+				return processSpy;
 			});
 			spyOn(emitter, 'emit');
 			mockery.enable({ useCleanCache : true});
@@ -78,6 +83,7 @@ describe('phonegap cordova dependency tests', function(){
 			spyOn(shell, 'which').and.returnValue(true);
 			spyOn(shell, 'exec').and.callFake(function(command, options, callback){ 
 				callback(0, 'success');
+				return processSpy;
 			});
 			spyOn(emitter, 'emit');
 		});
