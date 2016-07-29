@@ -49,12 +49,13 @@ module.exports.exec = function (projectDir, extEvents) {
 	}).then(function(pkgJsonPath){
 		pkgJson = './' + path.relative(__dirname, pkgJsonPath);
 		pkgJson = require(pkgJson);
-		var deferred = Q.defer();
+		
 		//Does not have cordova dependency in package.json
 		if (!pkgJson.dependencies || !pkgJson.dependencies.hasOwnProperty('cordova')) {
 			if(!shell.which('npm')) {
 		        return Q.reject(new Error('"npm" command line tool is not installed: make sure it is accessible on your PATH.'));
 		    }
+		    var deferred = Q.defer();
 
 		    // Find the latest version of Cordova published and install it
 	        var cordovaCommand= 'npm install cordova --save';
@@ -83,11 +84,10 @@ module.exports.exec = function (projectDir, extEvents) {
 	        child.stderr.on('data', function(data) {
 				extEvents.emit('raw', data.toString('utf8').replace('\n',''));
 	        });
+	        return deferred.promise;
 		} else {
 			extEvents.emit('verbose', 'Found Cordova dependency in package.json');
-			deferred.resolve();
-		}
-		return deferred.promise;	
+		}	
 	}).then(function(){
 		return PROJECTROOT;
 	});
