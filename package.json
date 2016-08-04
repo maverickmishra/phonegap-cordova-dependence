@@ -14,7 +14,7 @@
   "author": "carynbear",
   "license": "ISC",
   "dependencies": {
-    "cordova-common": "^1.3.0",
+    "cordova-common": "^1.5.0",
     "q": "^1.4.1",
     "shelljs": "^0.7.0"
   },
