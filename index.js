@@ -1,10 +1,10 @@
 var fs = require('fs'),
-	path = require('path'),
-	EventEmitter = require('events').EventEmitter,
-	Q = require('q'),
-	shell = require('shelljs'),
-	getProjectRoot = require('cordova-common').CordovaCheck.findProjectRoot,
-	ConfigParser = require('cordova-common').ConfigParser;
+		path = require('path'),
+		EventEmitter = require('events').EventEmitter,
+		Q = require('q'),
+		shell = require('shelljs'),
+		getProjectRoot = require('cordova-common').CordovaCheck.findProjectRoot,
+		ConfigParser = require('cordova-common').ConfigParser;
 /**
  * Given a PhoneGap project, pin Cordova as a dependency. Installation is not verified if dependency already exists.
  *
@@ -12,9 +12,9 @@ var fs = require('fs'),
  * 2) Create package.json from config.xml if it does not exist
  * 3) If cordova is not a dependency, use npm to install and save it to package.json
  *
- *  
+ *
  * @param  {Path[String]} projectDir [Path to anywhere within the PhoneGap project being modified]
- * @param  {EventEmitter|False} extEvents   [Used for events emitting. If undefined, 'log' and 'warn' will log to console. If false, will silence logging] (optional) 
+ * @param  {EventEmitter|False} extEvents   [Used for events emitting. If undefined, 'log' and 'warn' will log to console. If false, will silence logging] (optional)
  * @return {Promise|Error}            [Returns the project root path or a cordova error.]
  */
 module.exports.exec = function (projectDir, extEvents) {
@@ -32,14 +32,14 @@ module.exports.exec = function (projectDir, extEvents) {
 	}).then(function(projectRoot){
 		shell.cd(projectRoot);
 		var config,
-			pkgJson,
-			pkgJsonPath = path.resolve(projectRoot, 'package.json');
+				pkgJson,
+				pkgJsonPath = path.resolve(projectRoot, 'package.json');
 
 		if (!fs.existsSync(pkgJsonPath)) {
-			extEvents.emit('warn', 'No package.json was found for your project. Creating one from config.xml');		
-			config = new ConfigParser(path.resolve(projectRoot, 'config.xml'));
-			pkgJson = {};
-            pkgJson.name = (config.name() || path.basename(projectRoot)).toLowerCase().replace(' ',''); 
+			extEvents.emit('warn', 'No package.json was found for your project. Creating one from config.xml');
+						config = new ConfigParser(path.resolve(projectRoot, 'config.xml'));
+						pkgJson = {};
+            pkgJson.name = (config.name() || path.basename(projectRoot)).toLowerCase().replace(' ','');
             pkgJson.version = config.version() || '1.0.0';
             fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 4), 'utf8');
             return pkgJsonPath;
@@ -47,9 +47,9 @@ module.exports.exec = function (projectDir, extEvents) {
 			return pkgJsonPath;
 		}
 	}).then(function(pkgJsonPath){
-		pkgJson = './' + path.relative(__dirname, pkgJsonPath);
-		pkgJson = require(pkgJson);
-		
+		//pkgJson = './' + path.relative(__dirname, pkgJsonPath);
+		pkgJson = require(pkgJsonPath); 
+
 		//Does not have cordova dependency in package.json
 		if (!pkgJson.dependencies || !pkgJson.dependencies.hasOwnProperty('cordova')) {
 			if(!shell.which('npm')) {
@@ -60,11 +60,7 @@ module.exports.exec = function (projectDir, extEvents) {
 		    // Find the latest version of Cordova published and install it
 	        var cordovaCommand= 'npm install cordova --save';
 	        extEvents.emit('log', 'Adding Cordova dependency with: "' +  cordovaCommand +'"');
-	        /* OR Find the system version of Cordova installed //To/Do: handle dev version case
-	        *  var cordovaVersionCommand = 'cordova -v'
-	        *  var cordovaVersion = ... use shell.exec
-	        *  var cordovaCommand = 'npm install --save cordova@'+ cordovaVersion 
-	        */
+					extEvents.emit('log','This may take a few minutes ...');
 	        var child = shell.exec(cordovaCommand, {silent:true}, function(code, stdout, stderr) {
 	            if (code != 0) {
 	                e = new Error('Error from npm: '+ stdout.replace('\n',''));
@@ -78,16 +74,16 @@ module.exports.exec = function (projectDir, extEvents) {
 	        });
 
 	        child.stdout.on('data', function(data) {
-	            extEvents.emit('raw', data.toString('utf8').replace('\n',''));
+	          //  extEvents.emit('raw', data.toString('utf8').replace('\n',''));
 	        });
 
 	        child.stderr.on('data', function(data) {
-				extEvents.emit('raw', data.toString('utf8').replace('\n',''));
+					// extEvents.emit('raw', data.toString('utf8').replace('\n',''));
 	        });
 	        return deferred.promise;
 		} else {
 			extEvents.emit('verbose', 'Found Cordova dependency in package.json');
-		}	
+		}
 	}).then(function(){
 		return PROJECTROOT;
 	});
@@ -105,4 +101,3 @@ function ConsoleEmitter(arg) {
 	}
 	return emitter;
 }
-
